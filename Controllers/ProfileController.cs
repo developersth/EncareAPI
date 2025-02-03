@@ -47,6 +47,9 @@ namespace EncareAPI.Controllers
 
             var newUser = new User
             {
+                Id = existingUser.Id,
+                GoogleId = existingUser.GoogleId,
+                Email = profileRequest.Email,
                 Name = profileRequest.Name,
                 PasswordHash = UserService.HashPassword(profileRequest.Password),
                 Sex = profileRequest.Sex,
@@ -54,9 +57,7 @@ namespace EncareAPI.Controllers
                 Phone =profileRequest.Phone,
             };
 
-            newUser = await _userService.EditUserAsync(newUser); // Get the user with the generated ID
-
-
+             await _userService.UpdateUserAsync(newUser); // Get the user with the generated ID
 
             return Ok(new { message = "Profile updated successfully" });
         }

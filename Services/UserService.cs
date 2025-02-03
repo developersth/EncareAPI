@@ -27,10 +27,14 @@ namespace EncareAPI.Services
             return user; // Return the created user (important for getting the ID)
         }
 
-        public async Task<User?> EditUserAsync(User user)
+        public async Task UpdateUserAsync(User updatedUser)
         {
-            var result = await _users.ReplaceOneAsync(u => u.Email == user.Email, user);
-            return user; // Return null if no modification was made
+            var result = await _users.ReplaceOneAsync(user => user.Email == updatedUser.Email, updatedUser);
+            if (result.ModifiedCount == 0)
+            {
+                throw new Exception("User update failed.");
+            }
+
         }
 
         public static string HashPassword(string password)
