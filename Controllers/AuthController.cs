@@ -44,14 +44,13 @@ namespace EncareAPI.Controllers
             {
                 Email = registerRequest.Email,
                 Name = registerRequest.Name,
-                // ... other properties (you might want to hash passwords here)
+                PasswordHash = UserService.HashPassword(registerRequest.Password)
             };
 
             newUser = await _userService.CreateUserAsync(newUser); // Get the user with the generated ID
 
             // JWT generation (optional but recommended)
             var token = GenerateJwtToken(newUser);
-
             return CreatedAtAction(nameof(GetUser), new { id = newUser.Id }, new { Token = token, User = newUser }); // 201 Created with location header and user data
         }
 
@@ -66,6 +65,16 @@ namespace EncareAPI.Controllers
                 return NotFound();
             }
             return Ok(user);
+        }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserLogin login)
+        {
+            var existingUser = await _userService.GetUserByEmail(login.Email);
+            if (existingUser == null || existingUser.PasswordHash != UserService.HashPassword(login.Password))
+                return Unauthorized(new { message = "Invalid credentials" });
+
+            var token = GenerateJwtToken(existingUser);
+            return Ok(new { token });
         }
         [HttpGet("google/login")]
         public IActionResult GoogleLogin()
