@@ -10,12 +10,11 @@ namespace EncareAPI.Models
         public string Email { get; set; } = null!;
         public string Password { get; set; } // Store hashed passwords
         public string Name { get; set; } = null!;
-        [BsonElement("Sex")]
         public string Sex { get; set; }
-        [BsonElement("Phone")]
         public string? Phone { get; set; } = null!;
-        [BsonElement("Birthday")]
         public DateTime? Birthday { get; set; }
+        public double? Weight { get; set; } // น้ำหนัก (kg)
+        public double? Height { get; set; } // ส่วนสูง (cm)
 
     }
 }

@@ -55,6 +55,8 @@ namespace EncareAPI.Controllers
                 Sex = profileRequest.Sex,
                 Birthday = profileRequest.Birthday,
                 Phone =profileRequest.Phone,
+                Height=profileRequest.Height,
+                Weight = profileRequest.Weight
             };
 
              await _userService.UpdateUserAsync(newUser); // Get the user with the generated ID

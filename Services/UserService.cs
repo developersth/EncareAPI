@@ -30,7 +30,7 @@ namespace EncareAPI.Services
         public async Task UpdateUserAsync(User updatedUser)
         {
             var result = await _users.ReplaceOneAsync(user => user.Email == updatedUser.Email, updatedUser);
-            if (result.ModifiedCount == 0)
+            if (!result.IsAcknowledged)
             {
                 throw new Exception("User update failed.");
             }
