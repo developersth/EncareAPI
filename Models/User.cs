@@ -16,13 +16,12 @@ namespace EncareAPI.Models
 
     public string Name { get; set; } = null!;
 
-    [BsonElement("Sex")]
-    public string Sex { get; set; }
+    [BsonElement("Gender")]
+    public string Gender { get; set; }
 
     [BsonElement("Phone")]
     public string? Phone { get; set; } = null!;
 
-    [BsonElement("Birthday")]
     public DateTime? Birthday { get; set; }
 
     [BsonElement("Weight")]

@@ -1,8 +1,12 @@
-﻿using EncareAPI.Models;
+﻿using System.Globalization;
+using EncareAPI.Models;
 using EncareAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver.Linq;
+
 
 namespace EncareAPI.Controllers
 {
@@ -20,6 +24,7 @@ namespace EncareAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetProfile([FromQuery] string email)
         {
             var user = await _userService.GetUserByEmailAsync(email);
@@ -27,10 +32,21 @@ namespace EncareAPI.Controllers
             {
                 return NotFound(new { message = "User not found" });
             }
-            return Ok(user);
+
+            var newUser = new UserInfo
+            {
+                Email = user.Email,
+                FullName = user.Name,
+                Gender = user.Gender,
+                DateOfBirth = user.Birthday.Value.ToString("dd/MM/yyyy", CultureInfo.GetCultureInfo("en-US")),
+                Age = CalculateAge(user.Birthday)
+
+            };
+            return Ok(newUser);
         }
 
         [HttpPut("edit")]
+        [Authorize]
         public async Task<IActionResult> EditProfile([FromBody] ProfileRequest profileRequest)
         {
             if (!ModelState.IsValid)
@@ -52,19 +68,20 @@ namespace EncareAPI.Controllers
                 Email = profileRequest.Email,
                 Name = profileRequest.Name,
                 PasswordHash = UserService.HashPassword(profileRequest.Password),
-                Sex = profileRequest.Sex,
+                Gender = profileRequest.Gender,
                 Birthday = profileRequest.Birthday,
-                Phone =profileRequest.Phone,
-                Height=profileRequest.Height,
+                Phone = profileRequest.Phone,
+                Height = profileRequest.Height,
                 Weight = profileRequest.Weight
             };
 
-             await _userService.UpdateUserAsync(newUser); // Get the user with the generated ID
+            await _userService.UpdateUserAsync(newUser); // Get the user with the generated ID
 
             return Ok(new { message = "Profile updated successfully" });
         }
 
         [HttpGet("settings")]
+        [Authorize]
         public IActionResult GetSettings()
         {
             return Ok(new { message = "User settings" });
@@ -77,9 +94,26 @@ namespace EncareAPI.Controllers
         }
 
         [HttpPost("logout")]
+             [Authorize]
         public IActionResult Logout()
         {
             return Ok(new { message = "User logged out successfully" });
+        }
+        // 📌 ฟังก์ชันคำนวณอายุจากวันเกิด
+        private int CalculateAge(DateTime? birthday)
+        {
+            if (birthday == null) return 0; // ถ้าไม่มีวันเกิด ให้คืนค่า 0
+
+            var today = DateTime.Today;
+            var age = today.Year - birthday.Value.Year;
+
+            // ตรวจสอบว่าวันเกิดปีนี้มาถึงหรือยัง (ถ้ายังอายุยังไม่ถึง ต้อง -1)
+            if (birthday.Value.Date > today.AddYears(-age))
+            {
+                age--;
+            }
+
+            return age;
         }
     }
 }

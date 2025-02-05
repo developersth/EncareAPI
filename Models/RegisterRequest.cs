@@ -14,6 +14,8 @@ namespace EncareAPI.Models
 
         [Required]
         public string Password { get; set; } // Store hashed passwords
+        public string? Phone { get; set; } = null!;
+        public DateTime? Birthday { get; set; }
 
     }
 }

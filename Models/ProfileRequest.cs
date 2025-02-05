@@ -10,7 +10,7 @@ namespace EncareAPI.Models
         public string Email { get; set; } = null!;
         public string Password { get; set; } // Store hashed passwords
         public string Name { get; set; } = null!;
-        public string Sex { get; set; }
+        public string Gender { get; set; }
         public string? Phone { get; set; } = null!;
         public DateTime? Birthday { get; set; }
         public double? Weight { get; set; } // น้ำหนัก (kg)

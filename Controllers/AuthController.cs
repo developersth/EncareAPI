@@ -74,7 +74,7 @@ namespace EncareAPI.Controllers
                 return Unauthorized(new { message = "Invalid credentials" });
 
             var token = GenerateJwtToken(existingUser);
-            return Ok(new { token });
+            return Ok(new { Token = token, User = existingUser });
         }
         [HttpGet("google/login")]
         public IActionResult GoogleLogin()
@@ -102,23 +102,32 @@ namespace EncareAPI.Controllers
                     string name = userClaims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? "";
 
                     var existingUser = await _userService.GetUserByGoogleIdAsync(googleId);
+                    var emailUser = await _userService.GetUserByEmailAsync(email);
 
                     if (existingUser == null)
                     {
+                        if (emailUser != null)
+                        {
+                            // ❌ ป้องกันการลงทะเบียนซ้ำ
+                            return BadRequest("This email is already registered. Please log in instead.");
+                        }
+
+                        // ✅ สร้างบัญชีใหม่เฉพาะกรณีที่อีเมลไม่มีในระบบ
                         var newUser = new User { GoogleId = googleId, Email = email, Name = name };
                         await _userService.CreateUserAsync(newUser);
-                        existingUser = newUser; // Use the newly created user
+                        existingUser = newUser;
                     }
 
-                    // JWT Generation (Optional but recommended)
+                    // JWT Generation
                     var token = GenerateJwtToken(existingUser);
 
-                    return Ok(new { Token = token }); // Or return user info + token
+                    return Ok(new { Token = token });
                 }
             }
 
             return BadRequest("Authentication failed.");
         }
+
 
 
         private string GenerateJwtToken(User user)
