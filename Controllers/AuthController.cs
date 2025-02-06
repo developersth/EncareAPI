@@ -72,7 +72,7 @@ namespace EncareAPI.Controllers
             var existingUser = await _userService.GetUserByEmail(login.Email);
             if (existingUser == null || existingUser.PasswordHash != UserService.HashPassword(login.Password))
                 return Unauthorized(new { message = "Invalid credentials" });
-
+            existingUser.PasswordHash = null;
             var token = GenerateJwtToken(existingUser);
             return Ok(new { Token = token, User = existingUser });
         }

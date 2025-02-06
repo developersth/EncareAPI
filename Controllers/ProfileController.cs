@@ -38,8 +38,8 @@ namespace EncareAPI.Controllers
                 Email = user.Email,
                 FullName = user.Name,
                 Gender = user.Gender,
-                DateOfBirth = user.Birthday.Value.ToString("dd/MM/yyyy", CultureInfo.GetCultureInfo("en-US")),
-                Age = CalculateAge(user.Birthday)
+                DateOfBirth = user.Birthday?.ToString("dd/MM/yyyy", CultureInfo.GetCultureInfo("en-US")) ?? null,
+                Age = user.Birthday.HasValue ? CalculateAge(user.Birthday.Value) : (int?)null
 
             };
             return Ok(newUser);
@@ -94,7 +94,7 @@ namespace EncareAPI.Controllers
         }
 
         [HttpPost("logout")]
-             [Authorize]
+        [Authorize]
         public IActionResult Logout()
         {
             return Ok(new { message = "User logged out successfully" });
