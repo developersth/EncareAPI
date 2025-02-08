@@ -36,6 +36,30 @@ namespace EncareAPI.Services
             }
 
         }
+        public async Task SetPasswordResetToken(string email, string token, DateTime expiration)
+        {
+            var update = Builders<User>.Update
+                .Set(u => u.ResetToken, token)
+                .Set(u => u.ResetTokenExpiration, expiration);
+
+            await _users.UpdateOneAsync(u => u.Email == email, update);
+        }
+
+        public async Task<User> GetUserByResetTokenAsync(string token)
+        {
+            return await _users.Find(user => user.ResetToken == token && user.ResetTokenExpiration > DateTime.UtcNow).FirstOrDefaultAsync();
+        }
+
+        public async Task ResetPasswordAsync(string email, string newPassword)
+        {
+            var hashedPassword = HashPassword(newPassword);
+            var update = Builders<User>.Update
+                .Set(u => u.PasswordHash, hashedPassword)
+                .Set(u => u.ResetToken, null) // Clear token after reset
+                .Set(u => u.ResetTokenExpiration, null);
+
+            await _users.UpdateOneAsync(u => u.Email == email, update);
+        }
 
         public static string HashPassword(string password)
         {
@@ -46,6 +70,7 @@ namespace EncareAPI.Services
                 return Convert.ToBase64String(hash);
             }
         }
+
 
         public async Task<User> GetUserByIdAsync(string id) =>
             await _users.Find(x => x.Id == id).FirstOrDefaultAsync();

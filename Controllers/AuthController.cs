@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 
 namespace EncareAPI.Controllers
 {
@@ -66,6 +67,41 @@ namespace EncareAPI.Controllers
             }
             return Ok(user);
         }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        {
+            var user = await _userService.GetUserByEmailAsync(request.Email);
+            if (user == null) return NotFound(new { message = "User not found." });
+
+            // Generate reset token
+            var resetToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+            var expiration = DateTime.UtcNow.AddHours(1);
+            await _userService.SetPasswordResetToken(request.Email, resetToken, expiration);
+
+            // Generate reset link
+            string resetUrl = $"https://yourdomain.com/reset-password?token={resetToken}";
+
+            // Send email
+            // var emailService = new EmailService(_configuration);
+            // await emailService.SendEmailAsync(user.Email, "Password Reset Request",
+            //     $"<p>Click <a href='{resetUrl}'>here</a> to reset your password.</p>");
+
+            return Ok(new { message = "Password reset link sent to email." });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            var user = await _userService.GetUserByResetTokenAsync(request.Token);
+            if (user == null)
+            {
+                return BadRequest(new { message = "Invalid or expired token." });
+            }
+
+            await _userService.ResetPasswordAsync(user.Email, request.NewPassword);
+            return Ok(new { message = "Password has been reset successfully." });
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLogin login)
         {

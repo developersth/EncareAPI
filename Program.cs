@@ -16,6 +16,7 @@ var configuration = builder.Configuration;
 // MongoDB Configuration
 //builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB")); // For using options pattern (recommended)
 builder.Services.AddSingleton<UserService>(); // Register your data service
+builder.Services.AddSingleton<EmailService>(); // Register your data service
 
 // Google Authentication
 

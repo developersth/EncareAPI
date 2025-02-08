@@ -29,6 +29,8 @@ namespace EncareAPI.Models
 
     [BsonElement("Height")]
     public double? Height { get; set; } // ส่วนสูง (cm)
+    public string? ResetToken { get; set; }
+    public DateTime? ResetTokenExpiration { get; set; }
 }
 
 }
