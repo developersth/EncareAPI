@@ -82,9 +82,9 @@ namespace EncareAPI.Controllers
             string resetUrl = $"https://yourdomain.com/reset-password?token={resetToken}";
 
             // Send email
-            // var emailService = new EmailService(_configuration);
-            // await emailService.SendEmailAsync(user.Email, "Password Reset Request",
-            //     $"<p>Click <a href='{resetUrl}'>here</a> to reset your password.</p>");
+            var emailService = new EmailService(_configuration);
+            await emailService.SendEmailAsync(user.Email, "Password Reset Request",
+                $"<p>Click <a href='{resetUrl}'>here</a> to reset your password.</p>");
 
             return Ok(new { message = "Password reset link sent to email." });
         }

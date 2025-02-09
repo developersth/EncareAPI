@@ -80,6 +80,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{//กำหนดให้แสดงบน prod
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 app.UseCors(MyAllowSpecificOrigins);
 app.UseHttpsRedirection();
 app.UseAuthentication();
