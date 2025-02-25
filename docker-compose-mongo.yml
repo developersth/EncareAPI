@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"  # Expose the default MongoDB port
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root  # Set root username
+      - MONGO_INITDB_ROOT_PASSWORD=examplepassword  # Set root password
+    volumes:
+      - mongodb-data:/data/db  # Persist data
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge  # Docker bridge network for internal communication
+
+volumes:
+  mongodb-data:
+    driver: local  # Persist MongoDB data between container restarts
