@@ -19,11 +19,12 @@ namespace EncareAPI.Controllers
     {
         private readonly UserService _userService;
         private readonly IConfiguration _configuration;
-
+        private readonly string _fontUrl;
         public AuthController(UserService userService, IConfiguration configuration)
         {
             _userService = userService;
             _configuration = configuration;
+            _fontUrl = configuration.GetValue<string>("FrontendUrl");
         }
 
         [HttpPost("register")] // New registration endpoint
@@ -79,7 +80,7 @@ namespace EncareAPI.Controllers
             await _userService.SetPasswordResetToken(request.Email, resetToken, expiration);
 
             // Generate reset link
-            string resetUrl = $"https://yourdomain.com/reset-password?token={resetToken}";
+            string resetUrl = $"{_fontUrl}/reset-password?token={resetToken}";
 
             // Send email
             var emailService = new EmailService(_configuration);
@@ -97,7 +98,7 @@ namespace EncareAPI.Controllers
             {
                 return BadRequest(new { message = "Invalid or expired token." });
             }
-
+            
             await _userService.ResetPasswordAsync(user.Email, request.NewPassword);
             return Ok(new { message = "Password has been reset successfully." });
         }
