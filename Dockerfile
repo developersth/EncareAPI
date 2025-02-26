@@ -1,28 +1,25 @@
-# Use the official .NET SDK image to build the app
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
-
-# Copy the project file and restore any dependencies (via dotnet restore)
-COPY ["EncareAPI.csproj", "EncareAPI/"]
-RUN dotnet restore "EncareAPI/EncareAPI.csproj"
-
-# Copy the entire project and build the app
-COPY . .
-WORKDIR /src/EncareAPI
-RUN dotnet build "EncareAPI.csproj" -c Release -o /app/build
-
-# Publish the app to the /app directory
-RUN dotnet publish "EncareAPI.csproj" -c Release -o /app/publish
-
-# Use the official .NET runtime image to run the app
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
+EXPOSE 5297 7297
 
-# Copy the published files from the build container
-COPY --from=build /app/publish .
+ENV ASPNETCORE_URLS="http://+:5297;https://+:7297"
 
-# Expose the port the app will run on
-EXPOSE 8080
+USER app
 
-# Set the entry point for the container
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG configuration=Release
+WORKDIR /src
+COPY ["EncareAPI.csproj", "./"]
+RUN dotnet restore "EncareAPI.csproj"
+COPY . .
+WORKDIR "/src/."
+RUN dotnet build "EncareAPI.csproj" -c $configuration -o /app/build
+
+FROM build AS publish
+ARG configuration=Release
+RUN dotnet publish "EncareAPI.csproj" -c $configuration -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "EncareAPI.dll"]

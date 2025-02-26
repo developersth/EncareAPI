@@ -11,11 +11,9 @@
 **/*.*proj.user
 **/*.dbmdl
 **/*.jfm
-**/azds.yaml
 **/bin
 **/charts
-**/docker-compose*
-**/Dockerfile*
+**/compose*
 **/node_modules
 **/npm-debug.log
 **/obj
@@ -23,8 +21,3 @@
 **/values.dev.yaml
 LICENSE
 README.md
-!**/.gitignore
-!.git/HEAD
-!.git/config
-!.git/packed-refs
-!.git/refs/heads/**

@@ -36,6 +36,12 @@ namespace EncareAPI.Services
             }
 
         }
+        public async Task<bool> DeleteUserAsync(string email)
+        {
+            var result = await _users.DeleteOneAsync(user => user.Email == email);
+            return result.DeletedCount > 0;
+        }
+
         public async Task SetPasswordResetToken(string email, string token, DateTime expiration)
         {
             var update = Builders<User>.Update

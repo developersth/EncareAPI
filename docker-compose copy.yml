@@ -1,21 +1,15 @@
 version: '3.8'
 
 services:
-  backend:
+  encareapi:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5297:5297"
-      - "7297:7297"  # Expose HTTPS port
+      - "8080:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__MongoDB=mongodb://mongo:27017
-      - ASPNETCORE_URLS=https://+:7297;http://+:5297
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=hoOkqJB9zu
-    volumes:
-      - ./https:/https  # Mount local certs to container
     depends_on:
       - mongo
     networks:

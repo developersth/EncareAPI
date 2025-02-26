@@ -193,5 +193,16 @@ namespace EncareAPI.Controllers
         {
             return Ok("This is a protected resource.");
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteUser(string email)
+        {
+            var success = await _userService.DeleteUserAsync(email);
+            if (!success)
+            {
+                return NotFound(new { message = "User not found or already deleted" });
+            }
+            return Ok(new { message = "User deleted successfully" });
+        }
     }
 }
