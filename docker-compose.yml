@@ -10,31 +10,31 @@ services:
       - "7297:7297"  # Expose HTTPS port
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__MongoDB=mongodb://mongo:27017
+      - ConnectionStrings__MongoDB=mongodb://EncareUser:Encare%40User1339@43.229.77.209:27017/?authSource=Encare_Project
       - ASPNETCORE_URLS=https://+:7297;http://+:5297
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=hoOkqJB9zu
     volumes:
       - ./https:/https  # Mount local certs to container
-    depends_on:
-      - mongo
+    # depends_on:
+    #   - mongo
     networks:
       - encare-network
 
-  mongo:
-    image: mongo:latest
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    networks:
-      - encare-network
-    volumes:
-      - mongo-data:/data/db
+  # mongo:
+  #   image: mongo:latest
+  #   container_name: mongo
+  #   ports:
+  #     - "27017:27017"
+  #   networks:
+  #     - encare-network
+  #   volumes:
+  #     - mongo-data:/data/db
 
 networks:
   encare-network:
     driver: bridge
 
-volumes:
-  mongo-data:
-    driver: local
+# volumes:
+#   mongo-data:
+#     driver: local
